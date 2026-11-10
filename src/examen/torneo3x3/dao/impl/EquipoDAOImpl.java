@@ -40,18 +40,16 @@ public class EquipoDAOImpl implements EquipoDAO {
     @Override
     public int insertarEquipo(EquipoDTO equipo, Connection conn) throws SQLException {
         int claveGenerada = -1;
-        int id = equipo.idEquipo();
         String nombre = equipo.nombre();
 
         String sql = """
                 insert into equipos
-                (id_equipo,nombre)
-                values(?,?)
+                (nombre)
+                values(?)
                 """;
         try (PreparedStatement sentenciaParametrizada = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            sentenciaParametrizada.setInt(1, id);
-            sentenciaParametrizada.setString(2, nombre);
+            sentenciaParametrizada.setString(1, nombre);
 
             sentenciaParametrizada.executeUpdate();
 
@@ -63,7 +61,7 @@ public class EquipoDAOImpl implements EquipoDAO {
 
         } catch (SQLException e) {
             if (e.getLocalizedMessage().equals(
-                    "[SQLITE_CONSTRAINT_PRIMARYKEY] A PRIMARY KEY constraint failed (UNIQUE constraint failed: equipos.id_equipo)")) {
+                    "[SQLITE_CONSTRAINT_UNIQUE] A UNIQUE constraint failed (UNIQUE constraint failed: equipos.nombre)")) {
                 throw new AccesoDatosException("Equipo duplicado: " + nombre);
             } else {
                 throw new SQLException(e);
