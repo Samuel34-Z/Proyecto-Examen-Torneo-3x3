@@ -29,7 +29,7 @@ public class PartidoDAOImpl implements PartidoDAO {
         String sql = """
                 select p.id_partido,p.id_local,p.id_visitante,p.fecha,p.puntos_local,p.puntos_visitante,p.estado,l.nombre as nom_local,v.nombre as nom_visitante from partidos p
                 join equipos l on l.id_equipo = p.id_local
-                join equipos v on v.id_equipo = p.id_local
+                join equipos v on v.id_equipo = p.id_visitante
                 where p.id_partido = ?
                 """;
 
@@ -38,7 +38,10 @@ public class PartidoDAOImpl implements PartidoDAO {
             sentenciaParametrizada.setInt(1, id);
 
             try (ResultSet rs = sentenciaParametrizada.executeQuery();) {
-                partido = mapear(rs);
+                if (rs.next()) {
+                    partido = mapear(rs);
+                }
+
             }
 
         }
